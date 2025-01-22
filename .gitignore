@@ -1,0 +1,14 @@
+.env
+
+__pycache__/
+*.pyc
+*.pyo
+*.sqlite3
+*.db
+*.log
+*.h
+*.cfg
+lib*
+groovesync/lib/
+groovesync/bin/
+app/config.py
