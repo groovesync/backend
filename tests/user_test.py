@@ -1,8 +1,13 @@
+
+
 import unittest
 from unittest.mock import patch
 from flask import Flask
 from app.routes.user import bp
 import jwt
+
+
+
 
 class UserRoutesTest(unittest.TestCase):
 
@@ -32,6 +37,13 @@ class UserRoutesTest(unittest.TestCase):
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response.json["message"], "User not found or could not be deleted")
 
+    def test_delete_account_unauthorized(self):
+        headers = {"Authorization": "Bearer invalid_token"}
+        response = self.client.delete("/user/delete", headers=headers)
+
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.json["message"], "Invalid token")
+
     @patch("app.models.user.User.find_user_by_credentials")
     @patch("app.models.user.User.update_password")
     def test_update_password_success(self, mock_update_password, mock_find_user):
@@ -57,6 +69,17 @@ class UserRoutesTest(unittest.TestCase):
 
         self.assertEqual(response.status_code, 401)
         self.assertEqual(response.json["message"], "Old password is incorrect")
+
+    def test_update_password_invalid_token(self):
+        headers = {"Authorization": "Bearer invalid_token"}
+        response = self.client.put("/user/update-password", headers=headers, json={
+            "old_password": "oldpass",
+            "new_password": "newpass"
+        })
+
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.json["message"], "Invalid token")
+
 
 if __name__ == "__main__":
     unittest.main()
