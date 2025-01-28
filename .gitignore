@@ -12,3 +12,4 @@ lib*
 groovesync/lib/
 groovesync/bin/
 app/config.py
+.idea/
