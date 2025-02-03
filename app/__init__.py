@@ -18,10 +18,6 @@ def create_app():
 
     limiter.init_app(app)
 
-
-    print("Configuração SPOTIFY_REDIRECT_URI:", app.config.get("SPOTIFY_REDIRECT_URI"))
-    print("Configuração SECRET_KEY:", app.config.get("SECRET_KEY"))  
-
     @app.teardown_appcontext
     def close_db_connection(exception):
         if hasattr(PersistenceManager, "close_connection"):

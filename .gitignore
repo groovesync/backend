@@ -11,4 +11,3 @@ __pycache__/
 lib*
 groovesync/lib/
 groovesync/bin/
-app/config.py
