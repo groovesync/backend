@@ -1,5 +1,5 @@
 from flask import Flask
-from app.routes import auth, user, spotify
+from app.routes import auth, user, spotify, review
 from app.utils.persistence_manager import PersistenceManager
 from app.config import config_dict, Config
 from flask_limiter import Limiter
@@ -26,5 +26,6 @@ def create_app():
     app.register_blueprint(auth.bp)
     app.register_blueprint(user.bp)
     app.register_blueprint(spotify.bp)
+    app.register_blueprint(review.bp)
 
     return app
