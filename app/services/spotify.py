@@ -6,15 +6,21 @@ from spotipy import SpotifyOAuth
 class SpotipyClient:
     _instance = None
 
-    def __new__(cls):
+    def __new__(cls, client_id=None, client_secret=None, redirect_uri=None):
         if cls._instance is None:
             cls._instance = super(SpotipyClient, cls).__new__(cls)
+
+            client_id = client_id or current_app.config.get('SPOTIPY_CLIENT_ID')
+            client_secret = client_secret or current_app.config.get('SPOTIPY_CLIENT_SECRET')
+            redirect_uri = redirect_uri or current_app.config.get('SPOTIPY_REDIRECT_URI')
+
             cls._instance.sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
-                client_id=current_app.config['SPOTIPY_CLIENT_ID'],
-                client_secret=current_app.config['SPOTIPY_CLIENT_SECRET'],
-                redirect_uri=current_app.config['SPOTIPY_REDIRECT_URI'],
-                scope='user-read-recently-played user-read-currently-playing user-top-read',
+                client_id=client_id,
+                client_secret=client_secret,
+                redirect_uri=redirect_uri,
+                scope='user-read-recently-played user-read-currently-playing user-top-read user-library-read',
             ))
+
         return cls._instance
 
     def get_recent_tracks(self, limit):
@@ -25,3 +31,6 @@ class SpotipyClient:
 
     def get_top_artists(self, limit):
         return self.sp.current_user_top_artists(limit)
+
+    def get_saved_albums(self, limit):
+        return self.sp.current_user_saved_albums(limit)
