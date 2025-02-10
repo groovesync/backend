@@ -16,8 +16,8 @@ def create_app():
 
     limiter.init_app(app)
 
-    with app.app_context():  # ✅ Garante que as importações ocorrem dentro do contexto da aplicação
-        from app.routes import auth, user, spotify  # Agora dentro do contexto
+    with app.app_context():  
+        from app.routes import auth, user, spotify  
 
         app.register_blueprint(auth.bp)
         app.register_blueprint(user.bp)
