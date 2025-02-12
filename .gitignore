@@ -13,3 +13,4 @@ groovesync/lib/
 groovesync/bin/
 .idea/
 app/config.py
+.vscode/
