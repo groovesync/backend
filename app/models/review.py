@@ -2,11 +2,11 @@ from app.utils.persistence_manager import PersistenceManager
 from datetime import datetime
 
 class Review:
-    def __init__(self, user_id, rate, text=None, timestamp=None):
+    def __init__(self, user_id, rate, text=None):
         self.user_id = user_id
         self.rate = rate
         self.text = text
-        self.timestamp = timestamp or int(datetime.utcnow().timestamp())
+        self.timestamp = datetime.utcnow().date()
 
     def save(self):
         db = PersistenceManager.get_database()
