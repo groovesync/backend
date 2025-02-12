@@ -42,3 +42,32 @@ def get_saved_albums():
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
+@bp.route('/search/', methods=['GET'])
+@token_required
+def search_artists_and_albums():
+    query = request.args.get('q', default='', type=str)
+    limit = request.args.get('limit', default=20, type=int)
+
+    if not query:
+        return jsonify({"success": False, "message": "Query parameter 'q' is required"}), 400
+
+    try:
+        data = spotipy_client.search(query, limit)
+        return jsonify({"success": True, "artists": data["artists"], "albums": data["albums"]}), 200
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@bp.route('/search/albums', methods=['GET'])
+@token_required
+def search_albums():
+    query = request.args.get('q', default='', type=str)
+    limit = request.args.get('limit', default=10, type=int)
+
+    if not query:
+        return jsonify({"success": False, "message": "Query parameter 'q' is required"}), 400    
+    
+    try:
+        albums = spotipy_client.search_albums(query, limit)
+        return jsonify({"success": True, "data": albums}), 200
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
