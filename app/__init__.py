@@ -17,11 +17,12 @@ def create_app():
     limiter.init_app(app)
 
     with app.app_context():  
-        from app.routes import auth, user, spotify  
+        from app.routes import auth, user, spotify, review 
 
         app.register_blueprint(auth.bp)
         app.register_blueprint(user.bp)
         app.register_blueprint(spotify.bp)
+        app.register_blueprint(review.bp)
 
     @app.teardown_appcontext
     def close_db_connection(exception):
@@ -29,3 +30,5 @@ def create_app():
             PersistenceManager.close_connection()
 
     return app
+
+  

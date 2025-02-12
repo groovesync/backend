@@ -1,4 +1,3 @@
-from flask import jsonify, request, current_app
 import jwt
 from datetime import datetime, timedelta
 from flask import Blueprint, request, jsonify, current_app
