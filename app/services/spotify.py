@@ -10,9 +10,9 @@ class SpotipyClient:
         if cls._instance is None:
             cls._instance = super(SpotipyClient, cls).__new__(cls)
 
-            client_id = client_id or current_app.config.get('SPOTIPY_CLIENT_ID')
-            client_secret = client_secret or current_app.config.get('SPOTIPY_CLIENT_SECRET')
-            redirect_uri = redirect_uri or current_app.config.get('SPOTIPY_REDIRECT_URI')
+            client_id = client_id or current_app.config.get('SPOTIFY_CLIENT_ID')
+            client_secret = client_secret or current_app.config.get('SPOTIFY_CLIENT_SECRET')
+            redirect_uri = redirect_uri or current_app.config.get('SPOTIFY_REDIRECT_URI')
 
             cls._instance.sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
                 client_id=client_id,
