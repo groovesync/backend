@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_cors import CORS
 from app.utils.persistence_manager import PersistenceManager
 from app.config import config_dict, Config
 from flask_limiter import Limiter
@@ -9,6 +10,8 @@ limiter = Limiter(get_remote_address, default_limits=["5 per minute"])
 
 def create_app():
     app = Flask(__name__)
+
+    CORS(app, resources={r"/": {"origins": ""}}, supports_credentials=True)
 
     env = os.getenv("FLASK_ENV", "development")
     app.config.from_object(config_dict.get(env, Config))
