@@ -4,14 +4,15 @@ from app.utils.persistence_manager import PersistenceManager
 from app.config import config_dict, Config
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from flask_cors import CORS
 import os
 
-limiter = Limiter(get_remote_address, default_limits=["5 per minute"])
+limiter = Limiter(get_remote_address, default_limits=["100 per minute"])
 
 def create_app():
     app = Flask(__name__)
 
-    CORS(app, resources={r"/": {"origins": ""}}, supports_credentials=True)
+    CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 
     env = os.getenv("FLASK_ENV", "development")
     app.config.from_object(config_dict.get(env, Config))
@@ -27,13 +28,6 @@ def create_app():
         app.register_blueprint(spotify.bp)
         app.register_blueprint(review.bp)
         
-    @app.after_request
-    def add_cors_headers(response):
-        response.headers['Access-Control-Allow-Origin'] = 'http://localhost:3000/'
-        response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Authorization'
-        response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
-        return response
-    
     @app.teardown_appcontext
     def close_db_connection(exception):
         if hasattr(PersistenceManager, "close_connection"):
