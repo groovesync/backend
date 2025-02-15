@@ -34,3 +34,44 @@ class SpotipyClient:
 
     def get_saved_albums(self, limit):
         return self.sp.current_user_saved_albums(limit)
+    
+    def search_albums(self,query, limit):
+        results = self.sp.search(q=query, limit=limit, type='album')
+        albums = results.get('albums', {}).get('items', [])
+
+        return [
+            {
+                "name": album["name"],
+                "id": album["id"],
+                "artist": album["artists"][0]["name"] if album["artists"] else "Unknown",
+                "release_date": album["release_date"],
+                "total_tracks": album["total_tracks"],
+                "image": album["images"][0]["url"] if album["images"] else None
+            }
+            for album in albums
+        ]
+
+    def search_artists_albums(self, query, limit):
+        results = self.sp.search(q=query, limit=limit, type='artist,album')
+
+        artists = results.get('artists', {}).get('items', [])
+        albums = results.get('albums', {}).get('items', [])
+
+        return {
+            "artists": [
+                {
+                    "name": artist["name"],
+                    "id": artist["id"],
+                    "image": artist["images"][0]["url"] if artist["images"] else None
+                } for artist in artists
+            ],
+            "albums": [
+                {
+                    "name": album["name"],
+                    "id": album["id"],
+                    "release_date": album["release_date"],
+                    "total_tracks": album["total_tracks"],
+                    "image": album["images"][0]["url"] if album["images"] else None
+                } for album in albums
+            ]
+        }
