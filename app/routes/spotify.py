@@ -140,3 +140,16 @@ def search_albums():
         return jsonify({"success": True, "data": albums}), 200
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
+
+@bp.route('/users/<spotify_id>', methods=['GET'])
+@token_required
+def get_user(spotify_id):
+    spotify_access_token = request.headers.get('Spotify-Token')
+    if not spotify_access_token:
+        return jsonify({"success": False, "message": "Spotify access token required"}), 401
+
+    try:
+        user = spotipy_client.get_user(spotify_access_token, spotify_id)
+        return jsonify({"success": True, "data": user}), 200
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500

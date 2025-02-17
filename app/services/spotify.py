@@ -79,3 +79,14 @@ class SpotipyClient:
                 } for album in albums
             ]
         }
+        
+    def get_user(self, auth, spotify_id):
+        self.sp.auth=auth
+        user = self.sp.user(spotify_id)
+        return {
+            "user": {
+                    "display_name": user["display_name"],
+                    "id": user["id"],
+                    "image": user["images"][0]["url"] if user["images"] else None,
+                } 
+         }
