@@ -96,14 +96,9 @@ def get_saved_albums():
         saved_albums = spotipy_client.get_saved_albums(spotify_access_token)
     except Exception as e:
         return jsonify({"success": False, "message": "Error fetching saved albums", "error": str(e)}), 500
-<<<<<<< HEAD
     return jsonify({"success": True, "data": saved_albums}), 200
 
-    
-=======
 
-
->>>>>>> e8882ca (Issue #19)
 @bp.route('/search', methods=['GET'])
 @token_required
 def search_artists_and_albums():
@@ -122,7 +117,6 @@ def search_artists_and_albums():
     except Exception as e:
         return jsonify({"success": False, "message": "Error fetching search data", "error": str(e)}), 500
     return jsonify({"success": True, "artists": data["artists"], "albums": data["albums"]}), 200
-
 
 
 @bp.route('/search/albums', methods=['GET'])
@@ -145,7 +139,6 @@ def search_albums():
     return jsonify({"success": True, "data": albums}), 200
 
 
-
 @bp.route('/users/<spotify_id>', methods=['GET'])
 @token_required
 def get_user(spotify_id):
@@ -158,7 +151,7 @@ def get_user(spotify_id):
     except Exception as e:
         return jsonify({"success": False, "message": "Error fetching user data",  "error": str(e)}), 500
     return jsonify({"success": True, "data": user}), 200
-    
+
 
 @bp.route('/albums/<album_id>', methods=['GET'])
 @token_required
@@ -237,4 +230,3 @@ def get_album_details(album_id):
             "reviews": other_reviews
         }
     }), 200
-
