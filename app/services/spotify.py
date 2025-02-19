@@ -23,20 +23,32 @@ class SpotipyClient:
 
         return cls._instance
 
-    def get_recent_tracks(self, limit):
+    def get_recent_tracks(self, auth, limit=5):
+        self.sp.auth = auth
         return self.sp.current_user_recently_played(limit=limit)
 
-    def get_currently_playing_track(self):
+    def get_currently_playing_track(self, auth):
+        self.sp.auth = auth
         return self.sp.current_user_playing_track()
 
-    def get_top_artists(self, limit):
-        return self.sp.current_user_top_artists(limit)
+    def get_top_artists(self, auth, limit=5):
+        self.sp.auth = auth        
+        return self.sp.current_user_top_artists(limit, offset=0, time_range='short_term')
+    
+    def get_artist(self, auth, artist_id):
+        self.sp.auth = auth       
+        return self.sp.artist(artist_id)
 
-    def get_saved_albums(self, limit):
+    def get_artist_albuns(self, auth, artist_id):
+        self.sp.auth = auth  
+        return self.sp.artist_albums(artist_id, "album")
+        
+    def get_saved_albums(self, auth, limit=20):
+        self.sp.auth = auth
         return self.sp.current_user_saved_albums(limit)
     
-    def search_albums(self,auth, query, limit):
-        self.sp.auth= auth
+    def search_albums(self, auth, query, limit=20):
+        self.sp.auth = auth
         results = self.sp.search(q=query, limit=limit, type='album')
         albums = results.get('albums', {}).get('items', [])
 
@@ -53,8 +65,8 @@ class SpotipyClient:
             for album in albums
         ]
 
-    def search_artists_albums(self,auth, query, limit):
-        self.sp.auth=auth
+    def search_artists_albums(self,auth, query, limit=20):
+        self.sp.auth = auth
         results = self.sp.search(q=query, limit=limit, type='artist,album')
         artists = results.get('artists', {}).get('items', [])
         albums = results.get('albums', {}).get('items', [])
@@ -81,7 +93,7 @@ class SpotipyClient:
         }
         
     def get_user(self, auth, spotify_id):
-        self.sp.auth=auth
+        self.sp.auth = auth
         user = self.sp.user(spotify_id)
         return {
             "user": {
