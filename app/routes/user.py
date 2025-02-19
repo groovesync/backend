@@ -105,3 +105,24 @@ def update_password():
         return jsonify({"success": True, "message": "Password updated successfully"}), 200
     else:
         return jsonify({"success": False, "message": "Could not update the password"}), 500
+
+@bp.route('/search', methods=['GET'])
+@token_required
+def search_users():
+    query = request.args.get('q')
+    
+    try:
+        users = User.search_users(query)
+        return jsonify({"success": True, "data": users}), 200
+    except Exception as e:
+        return jsonify({"success": False, "message": "No users found"}), 404
+    
+@bp.route('/users', methods=['GET'])
+@token_required
+def get_all_users():
+    try:
+        users = User.get_all_users()
+        return jsonify({"success": True, "data": users}), 200
+    except Exception as e:
+        
+        return jsonify({"success": False, "message": "No users found"}), 404

@@ -102,24 +102,33 @@ def get_saved_albums():
     except Exception as e:
         return jsonify({"success": False, "message": "Error fetching saved albums", "error": str(e)}), 500
     
-@bp.route('/search/', methods=['GET'])
+@bp.route('/search', methods=['GET'])
 @token_required
 def search_artists_and_albums():
+    spotify_access_token = request.headers.get('Spotify-Token')
+    if not spotify_access_token:
+        return jsonify({"success": False, "message": "Spotify access token required"}), 401
+    
     query = request.args.get('q', default='', type=str)
     limit = request.args.get('limit', default=20, type=int)
 
     if not query:
         return jsonify({"success": False, "message": "Query parameter 'q' is required"}), 400
 
+    sp = spotipy.Spotify(auth=spotify_access_token)
     try:
-        data = spotipy_client.search(query, limit)
+        data = spotipy_client.search_artists_albums(spotify_access_token, query, limit)
         return jsonify({"success": True, "artists": data["artists"], "albums": data["albums"]}), 200
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
 @bp.route('/search/albums', methods=['GET'])
 @token_required
-def search_albums():
+def search_albums():    
+    spotify_access_token = request.headers.get('Spotify-Token')
+    if not spotify_access_token:
+        return jsonify({"success": False, "message": "Spotify access token required"}), 401
+
     query = request.args.get('q', default='', type=str)
     limit = request.args.get('limit', default=10, type=int)
 
@@ -127,7 +136,20 @@ def search_albums():
         return jsonify({"success": False, "message": "Query parameter 'q' is required"}), 400    
     
     try:
-        albums = spotipy_client.search_albums(query, limit)
+        albums = spotipy_client.search_albums(spotify_access_token, query, limit)
         return jsonify({"success": True, "data": albums}), 200
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@bp.route('/users/<spotify_id>', methods=['GET'])
+@token_required
+def get_user(spotify_id):
+    spotify_access_token = request.headers.get('Spotify-Token')
+    if not spotify_access_token:
+        return jsonify({"success": False, "message": "Spotify access token required"}), 401
+
+    try:
+        user = spotipy_client.get_user(spotify_access_token, spotify_id)
+        return jsonify({"success": True, "data": user}), 200
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500

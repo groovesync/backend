@@ -35,7 +35,8 @@ class SpotipyClient:
     def get_saved_albums(self, limit):
         return self.sp.current_user_saved_albums(limit)
     
-    def search_albums(self,query, limit):
+    def search_albums(self,auth, query, limit):
+        self.sp.auth= auth
         results = self.sp.search(q=query, limit=limit, type='album')
         albums = results.get('albums', {}).get('items', [])
 
@@ -46,14 +47,15 @@ class SpotipyClient:
                 "artist": album["artists"][0]["name"] if album["artists"] else "Unknown",
                 "release_date": album["release_date"],
                 "total_tracks": album["total_tracks"],
-                "image": album["images"][0]["url"] if album["images"] else None
+                "image": album["images"][0]["url"] if album["images"] else None,
+                "album_type": album["album_type"]
             }
             for album in albums
         ]
 
-    def search_artists_albums(self, query, limit):
+    def search_artists_albums(self,auth, query, limit):
+        self.sp.auth=auth
         results = self.sp.search(q=query, limit=limit, type='artist,album')
-
         artists = results.get('artists', {}).get('items', [])
         albums = results.get('albums', {}).get('items', [])
 
@@ -69,9 +71,22 @@ class SpotipyClient:
                 {
                     "name": album["name"],
                     "id": album["id"],
+                    "artist": album["artists"][0]["name"] if album["artists"] else "Unknown",
                     "release_date": album["release_date"],
                     "total_tracks": album["total_tracks"],
-                    "image": album["images"][0]["url"] if album["images"] else None
+                    "image": album["images"][0]["url"] if album["images"] else None,
+                    "album_type": album["album_type"]
                 } for album in albums
             ]
         }
+        
+    def get_user(self, auth, spotify_id):
+        self.sp.auth=auth
+        user = self.sp.user(spotify_id)
+        return {
+            "user": {
+                    "display_name": user["display_name"],
+                    "id": user["id"],
+                    "image": user["images"][0]["url"] if user["images"] else None,
+                } 
+         }

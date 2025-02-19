@@ -1,5 +1,6 @@
 import bcrypt
 from app.utils.persistence_manager import PersistenceManager
+import difflib
 
 class User:
     def __init__(self, username=None, password=None, spotify_id=None):
@@ -69,3 +70,35 @@ class User:
             {"$set": {"spotify_id": spotify_id}}
         )
         return result.matched_count > 0 and result.modified_count > 0
+    
+    @staticmethod
+    def search_users(q=None):
+        db = PersistenceManager.get_database()
+        all_users = list(db["users"].find())
+        results = difflib.get_close_matches(q, [user["username"] for user in all_users], cutoff=0.6)
+        
+        matched_users = [
+            {
+                "username": user["username"],
+                "spotify_id": user["spotify_id"]
+            }
+                for user in all_users if user["username"] in results
+        ]
+        
+        return {
+            "users": matched_users
+        }
+
+    @staticmethod
+    def get_all_users():
+        db = PersistenceManager.get_database()
+        users = list(db["users"].find())
+
+        return {
+            "users": [
+                {
+                    "username": user["name"],
+                    "spotify_id": user["spotify_id"]
+                } for user in users
+            ]
+            }
