@@ -2,9 +2,10 @@ from app.utils.persistence_manager import PersistenceManager
 from datetime import datetime
 
 class Review:
-    def __init__(self, user_id, rate, text=None):
+    def __init__(self, user_id, rate, album_id, text=None):
         self.user_id = user_id
         self.rate = rate
+        self.album_id = album_id
         self.text = text
         self.timestamp = datetime.utcnow().date()
 
@@ -19,6 +20,7 @@ class Review:
         review_data = {
             "userId": self.user_id,
             "rate": self.rate,
+            "albumId": self.album_id,
             "text": self.text,
             "timestamp": self.timestamp
         }
@@ -57,4 +59,9 @@ class Review:
         db = PersistenceManager.get_database()
         result = db.reviews.delete_one({"_id": review_id})
         return result.deleted_count > 0
+
+    @staticmethod
+    def get_by_album(album_id):
+        db = PersistenceManager.get_database()
+        return list(db.reviews.find({"albumId": album_id}).sort("timestamp", -1))
 
