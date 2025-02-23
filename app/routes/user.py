@@ -124,5 +124,5 @@ def get_all_users():
         users = User.get_all_users()
         return jsonify({"success": True, "data": users}), 200
     except Exception as e:
-        
         return jsonify({"success": False, "message": "No users found"}), 404
+

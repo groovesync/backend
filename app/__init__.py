@@ -1,5 +1,4 @@
 from flask import Flask
-from flask_cors import CORS
 from app.utils.persistence_manager import PersistenceManager
 from app.config import config_dict, Config
 from flask_limiter import Limiter

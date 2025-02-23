@@ -102,3 +102,9 @@ class User:
                 } for user in users
             ]
             }
+
+    @staticmethod
+    def find_user_by_id(user_id):
+        db = PersistenceManager.get_database()
+        return db.users.find_one({"_id": user_id})
+

@@ -90,3 +90,4 @@ class SpotipyClient:
                     "image": user["images"][0]["url"] if user["images"] else None,
                 } 
          }
+
