@@ -3,12 +3,9 @@ from flask import Blueprint, request, jsonify
 from app.models.review import Review
 from app.models.user import User
 from app.routes.user import token_required
-from app.services.spotify import SpotipyClient
 import spotipy
 
 bp = Blueprint('spotify', __name__, url_prefix='/spotify')
-spotipy_client = SpotipyClient()
-
 
 @bp.route('/recent-tracks', methods=['GET'])
 @token_required
@@ -121,7 +118,7 @@ def search_artists_and_albums():
 
     sp = spotipy.Spotify(auth=spotify_access_token)
     try:
-        data = spotipy_client.search_artists_albums(spotify_access_token, query, limit)
+        data = sp.search(q=query, type='artist,album', limit=limit)
         return jsonify({"success": True, "artists": data["artists"], "albums": data["albums"]}), 200
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
@@ -140,8 +137,9 @@ def search_albums():
     if not query:
         return jsonify({"success": False, "message": "Query parameter 'q' is required"}), 400    
     
+    sp = spotipy.Spotify(auth=spotify_access_token)
     try:
-        albums = spotipy_client.search_albums(spotify_access_token, query, limit)
+        albums = sp.search(q=query, type='album', limit=limit)
         return jsonify({"success": True, "data": albums}), 200
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
@@ -154,8 +152,9 @@ def get_user(spotify_id):
     if not spotify_access_token:
         return jsonify({"success": False, "message": "Spotify access token required"}), 401
 
+    sp = spotipy.Spotify(auth=spotify_access_token)
     try:
-        user = spotipy_client.get_user(spotify_access_token, spotify_id)
+        user = sp.user(spotify_id)
         return jsonify({"success": True, "data": user}), 200
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
