@@ -14,3 +14,4 @@ groovesync/bin/
 .idea/
 app/config.py
 .vscode/
+venv/

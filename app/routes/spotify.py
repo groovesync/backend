@@ -169,8 +169,7 @@ def get_album_details(album_id):
 
     sp = spotipy.Spotify(auth=spotify_access_token)
 
-    data = request.get_json()
-    user_id = data.get('user_id')
+    user_id = request.args.get("user_id", default="", type=str)
     if not user_id:
         return jsonify({"success": False, "message": "User ID is required"}), 400
 
