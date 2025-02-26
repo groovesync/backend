@@ -183,7 +183,7 @@ def get_album_details(album_id):
 
     album_name = album['name']
     album_url = album['external_urls']['spotify']
-    artists = [artist['name'] for artist in album['artists']]
+    artists = [{"name": artist['name'], "id": artist["id"]} for artist in album['artists']]
     release_year = album['release_date'][:4]
 
     reviews = Review.get_by_album(album_id)
@@ -193,6 +193,8 @@ def get_album_details(album_id):
             "message": "No reviews yet",
             "album_info": {
                 "name": album_name,
+                "id": album_id,
+                "image": album["images"][0]["url"],
                 "url": album_url,
                 "artists": artists,
                 "release_year": release_year,
