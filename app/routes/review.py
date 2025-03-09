@@ -10,6 +10,7 @@ def save():
         review = Review(
             user_id=data['userId'],
             rate=data['rate'],
+            album_id=data['albumId'],
             text=data.get('text')
         )
         review_id = review.save()
