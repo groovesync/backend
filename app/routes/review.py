@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from app.models.review import Review
+import spotipy
 
 bp = Blueprint('review', __name__, url_prefix='/review')
 
@@ -20,9 +21,39 @@ def save():
 
 @bp.route('/get/<user_id>', methods=['GET'])
 def get(user_id):
-    limit = int(request.args.get('limit', 1))
-    reviews = Review.get_by_user(user_id, limit)
-    return jsonify({"success": True, "reviews": reviews}), 200
+    reviews = Review.get_by_user(user_id)
+    spotify_access_token = request.headers.get('Spotify-Token')
+
+    if not spotify_access_token:
+        return jsonify({"success": False, "message": "Spotify access token required"}), 401
+
+    sp = spotipy.Spotify(auth=spotify_access_token)
+    enriched_reviews = []
+
+    for review in reviews:
+        try:
+            album = sp.album(review["albumId"])
+            if not album:
+                continue
+        except Exception as e:
+            return jsonify({"success": False, "message": "Error fetching album", "error": str(e)}), 400
+
+        enriched_reviews.append({
+            "album_id": album["id"],
+            "album_name": album["name"],
+            "album_url": album["external_urls"]["spotify"],
+            "album_image": album["images"][0]["url"] if album["images"] else None,
+            "release_year": album["release_date"][:4],
+            "artists": [{"name": artist["name"], "id": artist["id"]} for artist in album["artists"]],
+            "review_text": review["text"],
+            "rating": review["rate"],
+            
+        })
+
+    if not enriched_reviews:
+        return jsonify({"success": False, "message": "No reviews found"}), 204
+
+    return jsonify({"success": True, "reviews": enriched_reviews}), 200
 
 @bp.route('/update/<review_id>', methods=['PUT'])
 def update(review_id):

@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 
 from app.models.review import Review
 from app.models.user import User
+from app.models.favorite import Favorite
 from app.routes.user import token_required
 import spotipy
 
@@ -186,6 +187,9 @@ def get_album_details(album_id):
     artists = [{"name": artist['name'], "id": artist["id"]} for artist in album['artists']]
     release_year = album['release_date'][:4]
 
+    is_favorite_of_user = Favorite.is_favorite(user_id, album_id)
+    favorite_id = Favorite.get_favorite_id(user_id, album_id)
+
     reviews = Review.get_by_album(album_id)
     if not reviews:
         return jsonify({
@@ -193,7 +197,7 @@ def get_album_details(album_id):
             "message": "No reviews yet",
             "album_info": {
                 "name": album_name,
-                "id": album_id,
+                "id": album["id"],
                 "image": album["images"][0]["url"],
                 "url": album_url,
                 "artists": artists,
@@ -201,7 +205,9 @@ def get_album_details(album_id):
                 "overall_rating": None,
                 "your_rating": None,
                 "reviews": [],
-                "your_review": None
+                "your_review": None,
+                "is_favorite": is_favorite_of_user,
+                "favorite_id": favorite_id
             }
         }), 200
 
@@ -230,12 +236,16 @@ def get_album_details(album_id):
         "album_info": {
             "name": album_name,
             "url": album_url,
+            "image": album["images"][0]["url"],
             "artists": artists,
             "release_year": release_year,
             "overall_rating": overall_rating,
             "your_rating": your_rating,
             "your_review": your_review,
-            "reviews": other_reviews
+            "reviews": other_reviews,
+            "is_favorite": is_favorite_of_user,
+            "favorite_id": favorite_id,
+            "id": album["id"]
         }
     }), 200
 

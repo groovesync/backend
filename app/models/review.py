@@ -1,5 +1,6 @@
 from app.utils.persistence_manager import PersistenceManager
 from datetime import datetime
+from bson import ObjectId
 
 class Review:
     def __init__(self, user_id, rate, album_id, text=None):
@@ -21,8 +22,7 @@ class Review:
             "userId": self.user_id,
             "rate": self.rate,
             "albumId": self.album_id,
-            "text": self.text,
-            "timestamp": self.timestamp
+            "text": self.text
         }
         result = db.reviews.insert_one(review_data)
         return result.inserted_id
@@ -30,13 +30,17 @@ class Review:
     @staticmethod
     def is_valid_user(user_id):
         db = PersistenceManager.get_database()
-        return db.users.find_one({"_id": user_id}) is not None
+        return db.users.find_one({"spotify_id": user_id}) is not None
 
     @staticmethod
-    def get_by_user(user_id, limit=1):
+    def get_by_user(user_id):
         db = PersistenceManager.get_database()
-        return list(db.reviews.find({"userId": user_id}).sort("timestamp", -1).limit(limit))
+        reviews = list(db.reviews.find({"userId": user_id}).sort("timestamp", -1))
 
+        for review in reviews:
+            review["_id"] = str(review["_id"])
+        return reviews
+    
     @staticmethod
     def update(review_id, rate=None, text=None):
         db = PersistenceManager.get_database()
@@ -57,11 +61,21 @@ class Review:
     @staticmethod
     def delete(review_id):
         db = PersistenceManager.get_database()
-        result = db.reviews.delete_one({"_id": review_id})
+        try:
+            object_id = ObjectId(review_id)
+        except Exception as e:
+            print(f"Erro converting review_id: {e}")
+            return False
+        
+        result = db.reviews.delete_one({"_id": object_id})
         return result.deleted_count > 0
 
     @staticmethod
     def get_by_album(album_id):
         db = PersistenceManager.get_database()
-        return list(db.reviews.find({"albumId": album_id}).sort("timestamp", -1))
+        reviews = list(db.reviews.find({"albumId": album_id}).sort("timestamp", -1))
+
+        for review in reviews:
+            review["_id"] = str(review["_id"])
+        return reviews 
 
