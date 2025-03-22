@@ -78,4 +78,40 @@ def delete(review_id):
         return jsonify({"success": True}), 200
     else:
         return jsonify({"success": False, "message": "Review not found"}), 404
+    
+@bp.route('/get-by-review-id/<review_id>')
+def get_by_review_id(review_id):
+    review = Review.get_by_review_id(review_id)
+    spotify_access_token = request.headers.get('Spotify-Token')
+
+    if not spotify_access_token:
+        return jsonify({"success": False, "message": "Spotify access token required"}), 401
+
+    
+    if review:
+        sp = spotipy.Spotify(auth=spotify_access_token)
+        try:
+            album = sp.album(review["albumId"])
+        except Exception as e:
+            return jsonify({"success": False, "message": "Error fetching album", "error": str(e)}), 400
+
+        if album is None:
+            return jsonify({"success": False, "message": "No album found"}), 204
+
+        album_name = album['name']
+        artists = [{"name": artist['name'], "id": artist["id"]} for artist in album['artists']]
+        album_image = album["images"][0]["url"]
+        release_year = album['release_date'][:4]
+        album_id = album['id']
+            
+        return jsonify({"review": review, 
+                        "album_info": {
+                            "name": album_name,
+                            "artists": artists,
+                            "image": album_image,
+                            "release_year": release_year,
+                            "id": album_id
+                        }}), 200
+    else:
+        return jsonify({"review": None}), 404
 

@@ -246,6 +246,7 @@ def get_album_details(album_id):
     user_review = next((review for review in reviews if review['userId'] == user_id), None)
     your_rating = user_review['rate'] if user_review else None
     your_review = user_review['text'] if user_review else None
+    your_review_id = user_review["_id"] if user_review else None
 
     other_reviews = []
     for review in reviews:
@@ -272,6 +273,7 @@ def get_album_details(album_id):
             "overall_rating": overall_rating,
             "your_rating": your_rating,
             "your_review": your_review,
+            "your_review_id": your_review_id,
             "reviews": other_reviews,
             "is_favorite": is_favorite_of_user,
             "favorite_id": favorite_id,

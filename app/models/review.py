@@ -42,6 +42,20 @@ class Review:
         return reviews
     
     @staticmethod
+    def get_by_review_id(review_id):
+        db = PersistenceManager.get_database()
+        try:
+            object_id = ObjectId(review_id)
+            review = db.reviews.find_one({"_id": object_id})
+            if review:
+                review["_id"] = str(review["_id"])
+            return review
+        except Exception as e:
+            print(f"Erro converting review_id: {e}")
+            return None
+        
+    
+    @staticmethod
     def update(review_id, rate=None, text=None):
         db = PersistenceManager.get_database()
         update_data = {}
@@ -51,12 +65,15 @@ class Review:
             update_data["rate"] = rate
         if text is not None:
             update_data["text"] = text
-
-        result = db.reviews.update_one(
-            {"_id": review_id},
-            {"$set": update_data}
-        )
-        return result.matched_count > 0 and result.modified_count > 0
+        try:
+            object_id = ObjectId(review_id)
+            result = db.reviews.update_one(
+                {"_id": object_id},
+                {"$set": update_data}
+            )
+            return result.matched_count > 0 and result.modified_count > 0
+        except Exception as e:
+            return None
 
     @staticmethod
     def delete(review_id):
