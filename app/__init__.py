@@ -20,13 +20,14 @@ def create_app():
     limiter.init_app(app)
 
     with app.app_context():  
-        from app.routes import auth, user, spotify, review, follow
+        from app.routes import auth, user, spotify, review, follow, favorite
 
         app.register_blueprint(auth.bp)
         app.register_blueprint(user.bp)
         app.register_blueprint(spotify.bp)
         app.register_blueprint(review.bp)
         app.register_blueprint(follow.bp)
+        app.register_blueprint(favorite.bp)
         
     @app.teardown_appcontext
     def close_db_connection(exception):

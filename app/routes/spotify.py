@@ -2,13 +2,11 @@ from flask import Blueprint, request, jsonify
 
 from app.models.review import Review
 from app.models.user import User
+from app.models.favorite import Favorite
 from app.routes.user import token_required
-from app.services.spotify import SpotipyClient
 import spotipy
 
 bp = Blueprint('spotify', __name__, url_prefix='/spotify')
-spotipy_client = SpotipyClient()
-
 
 @bp.route('/recent-tracks', methods=['GET'])
 @token_required
@@ -121,7 +119,7 @@ def search_artists_and_albums():
 
     sp = spotipy.Spotify(auth=spotify_access_token)
     try:
-        data = spotipy_client.search_artists_albums(spotify_access_token, query, limit)
+        data = sp.search(q=query, type='artist,album', limit=limit)
         return jsonify({"success": True, "artists": data["artists"], "albums": data["albums"]}), 200
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
@@ -140,8 +138,9 @@ def search_albums():
     if not query:
         return jsonify({"success": False, "message": "Query parameter 'q' is required"}), 400    
     
+    sp = spotipy.Spotify(auth=spotify_access_token)
     try:
-        albums = spotipy_client.search_albums(spotify_access_token, query, limit)
+        albums = sp.search(q=query, type='album', limit=limit)
         return jsonify({"success": True, "data": albums}), 200
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
@@ -154,8 +153,9 @@ def get_user(spotify_id):
     if not spotify_access_token:
         return jsonify({"success": False, "message": "Spotify access token required"}), 401
 
+    sp = spotipy.Spotify(auth=spotify_access_token)
     try:
-        user = spotipy_client.get_user(spotify_access_token, spotify_id)
+        user = sp.user(spotify_id)
         return jsonify({"success": True, "data": user}), 200
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
@@ -170,8 +170,7 @@ def get_album_details(album_id):
 
     sp = spotipy.Spotify(auth=spotify_access_token)
 
-    data = request.get_json()
-    user_id = data.get('user_id')
+    user_id = request.args.get("user_id", default="", type=str)
     if not user_id:
         return jsonify({"success": False, "message": "User ID is required"}), 400
 
@@ -185,8 +184,11 @@ def get_album_details(album_id):
 
     album_name = album['name']
     album_url = album['external_urls']['spotify']
-    artists = [artist['name'] for artist in album['artists']]
+    artists = [{"name": artist['name'], "id": artist["id"]} for artist in album['artists']]
     release_year = album['release_date'][:4]
+
+    is_favorite_of_user = Favorite.is_favorite(user_id, album_id)
+    favorite_id = Favorite.get_favorite_id(user_id, album_id)
 
     reviews = Review.get_by_album(album_id)
     if not reviews:
@@ -195,13 +197,17 @@ def get_album_details(album_id):
             "message": "No reviews yet",
             "album_info": {
                 "name": album_name,
+                "id": album["id"],
+                "image": album["images"][0]["url"],
                 "url": album_url,
                 "artists": artists,
                 "release_year": release_year,
                 "overall_rating": None,
                 "your_rating": None,
                 "reviews": [],
-                "your_review": None
+                "your_review": None,
+                "is_favorite": is_favorite_of_user,
+                "favorite_id": favorite_id
             }
         }), 200
 
@@ -230,12 +236,16 @@ def get_album_details(album_id):
         "album_info": {
             "name": album_name,
             "url": album_url,
+            "image": album["images"][0]["url"],
             "artists": artists,
             "release_year": release_year,
             "overall_rating": overall_rating,
             "your_rating": your_rating,
             "your_review": your_review,
-            "reviews": other_reviews
+            "reviews": other_reviews,
+            "is_favorite": is_favorite_of_user,
+            "favorite_id": favorite_id,
+            "id": album["id"]
         }
     }), 200
 
