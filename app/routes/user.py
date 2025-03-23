@@ -4,6 +4,7 @@ from functools import wraps
 from app.models.user import User
 from app.utils.token_manager import TokenManager
 from datetime import datetime, timedelta
+import spotipy
 
 bp = Blueprint('user', __name__, url_prefix='/user')
 
@@ -110,11 +111,21 @@ def update_password():
 @token_required
 def search_users():
     query = request.args.get('q')
+    spotify_access_token = request.headers.get('Spotify-Token')
+    if not spotify_access_token:
+        return jsonify({"success": False, "message": "Spotify access token required"}), 401
     
+    sp = spotipy.Spotify(auth=spotify_access_token)
     try:
         users = User.search_users(query)
+        if users["users"]:
+            for user in users["users"]:
+                userInfo = sp.user(user["spotify_id"])
+                user["image"] = userInfo["images"][0]["url"]
+            
         return jsonify({"success": True, "data": users}), 200
     except Exception as e:
+        print(e)
         return jsonify({"success": False, "message": "No users found"}), 404
     
 @bp.route('/users', methods=['GET'])

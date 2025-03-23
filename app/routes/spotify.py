@@ -5,8 +5,10 @@ from app.models.user import User
 from app.models.favorite import Favorite
 from app.routes.user import token_required
 import spotipy
+import random
 
 bp = Blueprint('spotify', __name__, url_prefix='/spotify')
+RELEASE_OFFSET = random.randint(10, 30)
 
 @bp.route('/recent-tracks', methods=['GET'])
 @token_required
@@ -102,6 +104,34 @@ def get_saved_albums():
         return jsonify({"success": True, "data": saved_albums}), 200
     except Exception as e:
         return jsonify({"success": False, "message": "Error fetching saved albums", "error": str(e)}), 500
+
+@bp.route('/recommendations', methods=['GET'])
+@token_required
+def get_recommendation():
+    spotify_access_token = request.headers.get('Spotify-Token')
+    if not spotify_access_token:
+        return jsonify({"success": False, "message": "Spotify access token required"}), 401
+
+    sp = spotipy.Spotify(auth=spotify_access_token)
+    try:
+        recommendations = sp.new_releases(limit=10, offset=RELEASE_OFFSET)
+        return jsonify({"success": True, "data": recommendations}), 200
+    except Exception as e:
+        return jsonify({"success": False, "message": "Error fetching recommendations", "error": str(e)}), 500
+
+@bp.route('/new-releases', methods=['GET'])
+@token_required
+def get_new_releases():
+    spotify_access_token = request.headers.get('Spotify-Token')
+    if not spotify_access_token:
+        return jsonify({"success": False, "message": "Spotify access token required"}), 401
+
+    sp = spotipy.Spotify(auth=spotify_access_token)
+    try:
+        new_releases = sp.new_releases(limit=6, offset=(RELEASE_OFFSET+10+random.randint(3,6)))
+        return jsonify({"success": True, "data": new_releases}), 200
+    except Exception as e:
+        return jsonify({"success": False, "message": "Error fetching new releases", "error": str(e)}), 500
 
 
 @bp.route('/search', methods=['GET'])
@@ -216,6 +246,7 @@ def get_album_details(album_id):
     user_review = next((review for review in reviews if review['userId'] == user_id), None)
     your_rating = user_review['rate'] if user_review else None
     your_review = user_review['text'] if user_review else None
+    your_review_id = user_review["_id"] if user_review else None
 
     other_reviews = []
     for review in reviews:
@@ -242,6 +273,7 @@ def get_album_details(album_id):
             "overall_rating": overall_rating,
             "your_rating": your_rating,
             "your_review": your_review,
+            "your_review_id": your_review_id,
             "reviews": other_reviews,
             "is_favorite": is_favorite_of_user,
             "favorite_id": favorite_id,
