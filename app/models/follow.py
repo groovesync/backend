@@ -23,11 +23,9 @@ class Follow:
         db = PersistenceManager.get_database()
         try:
             following = list(db.follow.find({"spotifyId1": spotifyId}))
-            print("Following encontrados:", following)  # Adiciona um print para depuração
             
             for follow in following:
-                follow["_id"] = str(follow["_id"])  # Convertendo ObjectId para string
-                
+                follow["_id"] = str(follow["_id"])
             return following
         
         except Exception as e:
