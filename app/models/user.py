@@ -3,12 +3,10 @@ from app.utils.persistence_manager import PersistenceManager
 import difflib
 
 class User:
-    def __init__(self, username=None, password=None, spotify_id=None, followers=None, following=None):
+    def __init__(self, username=None, password=None, spotify_id=None):
         self.username = username
         self.password = password
         self.spotify_id = spotify_id
-        self.followers = followers if followers is not None else []
-        self.following = following if following is not None else []
 
     def save(self):
         db = PersistenceManager.get_database()
@@ -22,9 +20,7 @@ class User:
         db.users.insert_one({
             "username": self.username,
             "password": hashed_password.decode('utf-8') if hashed_password else None,
-            "spotify_id": self.spotify_id,
-            "followers": self.followers,
-            "following": self.following
+            "spotify_id": self.spotify_id
         })
         return True
 
@@ -111,20 +107,3 @@ class User:
     def find_user_by_id(user_id):
         db = PersistenceManager.get_database()
         return db.users.find_one({"_id": user_id})
-
-    @staticmethod
-    def update_followers(user_id, follower_id, action):
-        db = PersistenceManager.get_database()
-        if action == "add":
-            db.users.update_one({"user_id": user_id}, {"$addToSet": {"followers": follower_id}})
-        elif action == "remove":
-            db.users.update_one({"user_id": user_id}, {"$pull": {"followers": follower_id}})
-
-    @staticmethod
-    def update_following(user_id, following_id, action):
-        db = PersistenceManager.get_database()
-        if action == "add":
-            db.users.update_one({"user_id": user_id}, {"$addToSet": {"following": following_id}})
-        elif action == "remove":
-            db.users.update_one({"user_id": user_id}, {"$pull": {"following": following_id}})
-
