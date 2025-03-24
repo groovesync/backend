@@ -116,7 +116,7 @@ def get_by_review_id(review_id):
     else:
         return jsonify({"review": None}), 404
 
-@bp.route('/popular-with-friends', methods=['POST'])
+@bp.route('/popular-with-friends', methods=['GET'])
 def get_popular_with_friends():
     spotify_id = request.args.get('spotifyId', default="", type=str)
 
