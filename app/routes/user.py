@@ -18,11 +18,6 @@ def token_required(f):
         token = auth_header.split(" ")[1]
         try:
             payload = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
-            username = payload.get('username')
-
-            user = User.find_user_by_username(username)
-            if not user:
-                return jsonify({"success": False, "message": "User not found"}), 401
 
             request.user = payload
 
