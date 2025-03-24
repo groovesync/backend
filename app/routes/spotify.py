@@ -251,7 +251,7 @@ def get_album_details(album_id):
     other_reviews = []
     for review in reviews:
         if review['userId'] != user_id:
-            user = User.find_user_by_id(review['userId'])
+            user = User.find_user_by_spotify_id(review['userId'])
             if user:
                 spotify_id = user['spotify_id']
                 user_details = sp.user(spotify_id)

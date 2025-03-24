@@ -21,10 +21,18 @@ class Follow:
     # Get who a person follows, so the spotifyId parameter must be in spotifyId1
     def get_following(spotifyId):
         db = PersistenceManager.get_database()
-        following = list(db.follow.find({"spotifyId1": spotifyId}))
-        for follow in following:
-            follow["_id"] = str(follow["_id"])
-        return following
+        try:
+            following = list(db.follow.find({"spotifyId1": spotifyId}))
+            print("Following encontrados:", following)  # Adiciona um print para depuração
+            
+            for follow in following:
+                follow["_id"] = str(follow["_id"])  # Convertendo ObjectId para string
+                
+            return following
+        
+        except Exception as e:
+            print(f"Erro ao buscar seguidores: {e}")
+            return []
     
     # Get who follows a person, so the spotifyId parameter must be in spotifyId2
     def get_followers(spotifyId):
