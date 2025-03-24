@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from app.models.review import Review
+from app.models.follow import Follow
 import spotipy
 
 bp = Blueprint('review', __name__, url_prefix='/review')
@@ -115,3 +116,42 @@ def get_by_review_id(review_id):
     else:
         return jsonify({"review": None}), 404
 
+@bp.route('/popular-with-friends', methods=['POST'])
+def get_popular_with_friends():
+    spotify_id = request.args.get('spotifyId', default="", type=str)
+
+    following = Follow.get_following(spotify_id)
+    spotify_access_token = request.headers.get('Spotify-Token')
+
+    if not spotify_access_token:
+        return jsonify({"success": False, "message": "Spotify access token required"}), 401
+    
+    popular = []
+    if following:
+        for follow in following:
+            following_spotify_id = follow["spotifyId2"]
+            reviews = Review.get_by_user(following_spotify_id)
+            if reviews:
+                review = reviews[0]
+
+                sp = spotipy.Spotify(auth=spotify_access_token)
+                try:
+                    album = sp.album(review["albumId"])
+                except Exception as e:
+                    return jsonify({"success": False, "message": "Error fetching album", "error": str(e)}), 400
+
+                if album is None:
+                    return jsonify({"success": False, "message": "No album found"}), 204
+
+                album_name = album['name']
+                album_image = album["images"][0]["url"]
+                release_year = album['release_date'][:4]
+                album_id = album['id']
+
+                popular.append({
+                    "name": album_name,
+                    "image": album_image,
+                    "release_year": release_year,
+                    "id": album_id
+                })
+    return jsonify({"albums": popular}), 200
