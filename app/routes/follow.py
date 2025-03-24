@@ -75,7 +75,7 @@ def get_followers(spotify_id):
                     "user_display_name": user["display_name"],
                     "user_image": user["images"][0]["url"]
                 })
-                return jsonify({"following": enriched_followers}), 200
+                return jsonify({"followers": enriched_followers}), 200
             except Exception as e:
                 return jsonify({"success": False, "message": "Error fetching user information", "error": str(e)}), 400
         return jsonify({"followers": followers}), 200
