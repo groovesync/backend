@@ -259,7 +259,8 @@ def get_album_details(album_id):
                     "username": user_details['display_name'],
                     "profile_picture": user_details['images'][0]['url'] if user_details['images'] else None,
                     "rate": review['rate'],
-                    "text": review['text']
+                    "text": review['text'],
+                    "user_id": user["spotify_id"]
                 })
 
     return jsonify({
