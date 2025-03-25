@@ -28,11 +28,6 @@ def create_app():
         app.register_blueprint(review.bp)
         app.register_blueprint(follow.bp)
         app.register_blueprint(favorite.bp)
-        
-    @app.teardown_appcontext
-    def close_db_connection(exception):
-        if hasattr(PersistenceManager, "close_connection"):
-            PersistenceManager.close_connection()
 
     return app
 

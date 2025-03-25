@@ -26,10 +26,14 @@ class Favorite:
     @staticmethod
     def get_by_user(user_id):
         db = PersistenceManager.get_database()
-        favorites = list(db.favorites.find({"userId": user_id}).sort("timestamp", -1))
-        for favorite in favorites:
-            favorite["_id"] = str(favorite["_id"])
-        return favorites
+        try:
+            favorites = list(db.favorites.find({"userId": user_id}))
+            for favorite in favorites:
+                favorite["_id"] = str(favorite["_id"])
+            return favorites
+        except Exception as e:
+            print(e)
+            return []
     
     @staticmethod
     def is_favorite(user_id, album_id):

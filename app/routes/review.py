@@ -30,7 +30,6 @@ def get(user_id):
 
     sp = spotipy.Spotify(auth=spotify_access_token)
     enriched_reviews = []
-
     for review in reviews:
         try:
             album = sp.album(review["albumId"])
@@ -51,8 +50,8 @@ def get(user_id):
             
         })
 
-    if not enriched_reviews:
-        return jsonify({"success": False, "message": "No reviews found"}), 204
+    if enriched_reviews == []:
+        return jsonify({"success": False, "message": "No reviews found", "reviews": []}), 200
 
     return jsonify({"success": True, "reviews": enriched_reviews}), 200
 
@@ -130,7 +129,7 @@ def get_popular_with_friends():
     if following:
         for follow in following:
             following_spotify_id = follow["spotifyId2"]
-            reviews = Review.get_by_user(following_spotify_id)
+            reviews = Review.get_by_user_spotify_id(following_spotify_id)
             if reviews:
                 review = reviews[0]
 

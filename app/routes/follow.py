@@ -37,7 +37,7 @@ def get_following(spotify_id):
     if not spotify_access_token:
         return jsonify({"success": False, "message": "Spotify access token required"}), 401
 
-    if following:
+    if following != []:
         enriched_following = []
         for follow in following:
             spotifyId = follow["spotifyId2"]
@@ -47,7 +47,7 @@ def get_following(spotify_id):
                 enriched_following.append({
                     "user_id": spotifyId,
                     "user_display_name": user["display_name"],
-                    "user_image": user["images"][0]["url"]
+                    "user_image": user["images"][0]["url"] if user.get("images") and len(user["images"]) > 0 else None
                 })
             except Exception as e:
                 return jsonify({"success": False, "message": "Error fetching user information", "error": str(e)}), 400
@@ -72,7 +72,7 @@ def get_followers(spotify_id):
                 enriched_followers.append({
                     "user_id": spotifyId,
                     "user_display_name": user["display_name"],
-                    "user_image": user["images"][0]["url"]
+                    "user_image": user["images"][0]["url"] if user.get("images") and len(user["images"]) > 0 else None
                 })
             except Exception as e:
                 return jsonify({"success": False, "message": "Error fetching user information", "error": str(e)}), 400

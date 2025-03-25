@@ -27,7 +27,6 @@ class Follow:
             for follow in following:
                 follow["_id"] = str(follow["_id"])
             return following
-        
         except Exception as e:
             print(f"Erro ao buscar seguidores: {e}")
             return []
@@ -35,7 +34,11 @@ class Follow:
     # Get who follows a person, so the spotifyId parameter must be in spotifyId2
     def get_followers(spotifyId):
         db = PersistenceManager.get_database()
-        followers = list(db.follow.find({"spotifyId2": spotifyId}))
-        for follower in followers:
-            follower["_id"] = str(follower["_id"])
-        return followers
+        try:
+            followers = list(db.follow.find({"spotifyId2": spotifyId}))
+            for follower in followers:
+                follower["_id"] = str(follower["_id"])
+            return followers
+        except Exception as e:
+            print(e)
+            return []

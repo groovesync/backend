@@ -22,7 +22,7 @@ def get(user_id):
     favorites = Favorite.get_by_user(user_id)
 
     if not favorites:
-        return jsonify({"success": False, "message": "No favorites found"}), 204
+        return jsonify({"success": False, "message": "No favorites found", "favorites": []}), 200
 
     spotify_access_token = request.headers.get('Spotify-Token')
 
@@ -50,7 +50,7 @@ def get(user_id):
         })
 
     if not enriched_favorites:
-        return jsonify({"success": False, "message": "No favorites found"}), 204
+        return jsonify({"success": False, "message": "No favorites found", "favorites": []}), 200
 
     return jsonify({"success": True, "favorites": enriched_favorites}), 200
 

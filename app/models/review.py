@@ -35,7 +35,20 @@ class Review:
     @staticmethod
     def get_by_user(user_id):
         db = PersistenceManager.get_database()
-        reviews = list(db.reviews.find({"userId": user_id}).sort("timestamp", -1))
+        try:
+            reviews = list(db.reviews.find({"userId": user_id}).sort("timestamp", -1))
+
+            for review in reviews:
+                review["_id"] = str(review["_id"])
+            return reviews
+        except Exception as e:
+            print(e)
+            return []
+    
+    @staticmethod
+    def get_by_user_spotify_id(spotify_id):
+        db = PersistenceManager.get_database()
+        reviews = list(db.reviews.find({"userId": spotify_id}).sort("timestamp", -1))
 
         for review in reviews:
             review["_id"] = str(review["_id"])
