@@ -23,6 +23,7 @@ def save():
 @bp.route('/get/<user_id>', methods=['GET'])
 def get(user_id):
     reviews = Review.get_by_user(user_id)
+    reviews.sort(reverse=True)
     spotify_access_token = request.headers.get('Spotify-Token')
 
     if not spotify_access_token:
