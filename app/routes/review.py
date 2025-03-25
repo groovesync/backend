@@ -131,7 +131,7 @@ def get_popular_with_friends():
             following_spotify_id = follow["spotifyId2"]
             reviews = Review.get_by_user_spotify_id(following_spotify_id)
             if reviews:
-                review = reviews[0]
+                review = reviews[-1]
 
                 sp = spotipy.Spotify(auth=spotify_access_token)
                 try:
