@@ -20,7 +20,6 @@ def save():
 @bp.route('/get/<user_id>', methods=['GET'])
 def get(user_id):
     favorites = Favorite.get_by_user(user_id)
-    favorites.sort(reverse=True)
 
     if not favorites:
         return jsonify({"success": False, "message": "No favorites found", "favorites": []}), 200
