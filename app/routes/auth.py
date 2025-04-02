@@ -133,7 +133,6 @@ def login_spotify():
         "backend_token": backend_token,
         "spotify_access_token": access_token
     }
-    print(response_data)
     return jsonify(response_data), 200
 
 
