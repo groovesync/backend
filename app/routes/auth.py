@@ -128,7 +128,7 @@ def login_spotify():
             "spotify_id": spotify_id,
             "email": user_info.get("email"),
             "followers": user_info.get("followers", {}).get("total"),
-            "images": user_info.get("images"),
+            "images": user_info.get("images") if user_info["images"] else None,
         },
         "backend_token": backend_token,
         "spotify_access_token": access_token
