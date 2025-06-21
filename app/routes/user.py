@@ -9,6 +9,20 @@ import spotipy
 bp = Blueprint('user', __name__, url_prefix='/user')
 
 def token_required(f):
+    """
+    Decorator to require a valid JWT token for protected routes.
+    
+    Headers required:
+        Authorization: Bearer <token>
+        
+    Returns:
+        Decorated function or error response with:
+            - success (bool): False if authentication fails
+            - message (str): Error message
+            
+    Status codes:
+        - 401: Missing or invalid token
+    """
     @wraps(f)
     def decorated(*args, **kwargs):
         auth_header = request.headers.get('Authorization')
@@ -31,6 +45,27 @@ def token_required(f):
 
 @bp.route('/create', methods=['POST'])
 def create_user():
+    """
+    Create a new user account.
+    
+    Request body:
+        username (str): Desired username
+        password (str): User's password
+        spotify_id (str, optional): Spotify user ID
+        
+    Returns:
+        JSON response with:
+            - success (bool): Whether the creation was successful
+            - message (str): Success or error message
+            - user_info (dict): Created user information
+            - backend_token (str): JWT token for authentication
+            - refresh_token (str): Token for refreshing the JWT
+            
+    Status codes:
+        - 201: User created successfully
+        - 400: Missing required fields or user already exists
+        - 500: Server error during creation
+    """
     data = request.get_json()
     username = data.get('username')
     password = data.get('password')
@@ -51,7 +86,6 @@ def create_user():
         refresh_token = jwt.encode({"username": username, "exp": datetime.utcnow() + timedelta(days=7)},
                                    current_app.config['SECRET_KEY'], algorithm="HS256")
         
-        print(f"\n\n{token}\n\n{username}\n\n")
         TokenManager.store_refresh_token(username, refresh_token)
 
         return jsonify({
@@ -70,6 +104,22 @@ def create_user():
 @bp.route('/delete', methods=['DELETE'])
 @token_required
 def delete_account():
+    """
+    Delete a user account.
+    
+    Headers required:
+        Authorization: Bearer <token>
+        
+    Returns:
+        JSON response with:
+            - success (bool): Whether the deletion was successful
+            - message (str): Success or error message
+            
+    Status codes:
+        - 200: User deleted successfully
+        - 401: Invalid token or user not found
+        - 404: User not found
+    """
     username = request.user.get('username')
 
     if not username:
@@ -85,6 +135,27 @@ def delete_account():
 @bp.route('/update-password', methods=['PUT'])
 @token_required
 def update_password():
+    """
+    Update a user's password.
+    
+    Headers required:
+        Authorization: Bearer <token>
+        
+    Request body:
+        old_password (str): Current password
+        new_password (str): New password
+        
+    Returns:
+        JSON response with:
+            - success (bool): Whether the update was successful
+            - message (str): Success or error message
+            
+    Status codes:
+        - 200: Password updated successfully
+        - 400: Missing required fields
+        - 401: Invalid old password
+        - 500: Server error during update
+    """
     data = request.get_json()
     old_password = data.get('old_password')
     new_password = data.get('new_password')
@@ -105,6 +176,25 @@ def update_password():
 @bp.route('/search', methods=['GET'])
 @token_required
 def search_users():
+    """
+    Search for users by username.
+    
+    Headers required:
+        Authorization: Bearer <token>
+        
+    Query parameters:
+        q (str): Search query
+        
+    Returns:
+        JSON response with:
+            - success (bool): Whether the search was successful
+            - data (dict): List of matching users
+            - message (str): Error message if search fails
+            
+    Status codes:
+        - 200: Search successful
+        - 404: No users found
+    """
     query = request.args.get('q')
     spotify_access_token = request.headers.get('Spotify-Token')
     if not spotify_access_token:
@@ -126,6 +216,22 @@ def search_users():
 @bp.route('/users', methods=['GET'])
 @token_required
 def get_all_users():
+    """
+    Get a list of all users.
+    
+    Headers required:
+        Authorization: Bearer <token>
+        
+    Returns:
+        JSON response with:
+            - success (bool): Whether the request was successful
+            - data (dict): List of all users
+            - message (str): Error message if request fails
+            
+    Status codes:
+        - 200: Request successful
+        - 404: No users found
+    """
     try:
         users = User.get_all_users()
         return jsonify({"success": True, "data": users}), 200

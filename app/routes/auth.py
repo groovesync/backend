@@ -12,6 +12,25 @@ bp = Blueprint('auth', __name__, url_prefix='/auth')
 @bp.route('/login', methods=['POST'])
 @limiter.limit("5 per minute")
 def login():
+    """
+    Authenticate a user with username and password.
+    
+    Request body:
+        username (str): User's username
+        password (str): User's password
+        
+    Returns:
+        JSON response with:
+            - success (bool): Whether the login was successful
+            - token (str): JWT token for authentication
+            - refresh_token (str): Token for refreshing the JWT
+            - message (str): Error message if login fails
+            
+    Status codes:
+        - 200: Login successful
+        - 400: Missing username or password
+        - 401: Invalid credentials
+    """
     data = request.get_json()
     username = data.get('username')
     password = data.get('password')
@@ -38,6 +57,23 @@ def login():
 
 @bp.route('/refresh', methods=['POST'])
 def refresh():
+    """
+    Refresh an expired JWT token using a refresh token.
+    
+    Request body:
+        refresh_token (str): Valid refresh token
+        
+    Returns:
+        JSON response with:
+            - success (bool): Whether the refresh was successful
+            - token (str): New JWT token
+            - message (str): Error message if refresh fails
+            
+    Status codes:
+        - 200: Token refreshed successfully
+        - 400: Missing refresh token
+        - 401: Invalid or expired refresh token
+    """
     data = request.get_json()
     refresh_token = data.get('refresh_token')
 
@@ -63,6 +99,24 @@ def refresh():
 
 @bp.route('/login/spotify', methods=['POST'])
 def login_spotify():
+    """
+    Authenticate a user using Spotify OAuth.
+    
+    Request body:
+        code (str): Authorization code from Spotify
+        
+    Returns:
+        JSON response with:
+            - success (bool): Whether the login was successful
+            - user_info (dict): User information from Spotify
+            - backend_token (str): JWT token for authentication
+            - spotify_access_token (str): Token for Spotify API
+            - message (str): Error message if login fails
+            
+    Status codes:
+        - 200: Login successful
+        - 400: Missing code or Spotify authentication failed
+    """
     data = request.get_json()
     authorization_code = data.get('code')
     if not authorization_code:
@@ -133,12 +187,26 @@ def login_spotify():
         "backend_token": backend_token,
         "spotify_access_token": access_token
     }
-
     return jsonify(response_data), 200
 
 
 @bp.route('/logout', methods=['POST'])
 def logout():
+    """
+    Log out a user by invalidating their refresh token.
+    
+    Request body:
+        refresh_token (str): Refresh token to invalidate
+        
+    Returns:
+        JSON response with:
+            - success (bool): Whether the logout was successful
+            - message (str): Success or error message
+            
+    Status codes:
+        - 200: Logout successful
+        - 400: Missing refresh token
+    """
     data = request.get_json()
     refresh_token = data.get('refresh_token')
     if not refresh_token:
