@@ -47,7 +47,7 @@ def login():
         refresh_token = jwt.encode({"username": username, "exp": datetime.utcnow(
         ) + timedelta(days=7)}, current_app.config['SECRET_KEY'], algorithm="HS256")
         
-        # Usando TokenManager para armazenar o refresh token
+        # Using TokenManager to store the refresh token
         TokenManager.store_refresh_token(username, refresh_token)
         
         return jsonify({"success": True, "token": token, "refresh_token": refresh_token}), 200
@@ -80,7 +80,8 @@ def refresh():
     if not refresh_token:
         return jsonify({"success": False, "message": "Refresh token required"}), 400
 
-    TokenManager.cleanup_expired_tokens()  # Usando TokenManager para limpar tokens expirados
+    # Using TokenManager to clean up expired tokens
+    TokenManager.cleanup_expired_tokens()  
     db = PersistenceManager.get_database()
     stored_token = db.refresh_tokens.find_one(
         {"refresh_token": refresh_token, "exp": {"$gte": datetime.utcnow()}})
@@ -172,7 +173,7 @@ def login_spotify():
     backend_token = jwt.encode({"username": username, "exp": expiration_time},
                                current_app.config['SECRET_KEY'], algorithm="HS256")
 
-    # Usando TokenManager para armazenar o refresh token
+    # Using TokenManager to store the refresh token
     TokenManager.store_refresh_token(username, refresh_token)
 
     response_data = {
@@ -212,7 +213,7 @@ def logout():
     if not refresh_token:
         return jsonify({"success": False, "message": "Refresh token required"}), 400
 
-    # Usando TokenManager para deletar o refresh token
+    # Using TokenManager to delete the refresh token
     TokenManager.delete_refresh_token(refresh_token)
     
     return jsonify({"success": True, "message": "Logged out successfully"}), 200

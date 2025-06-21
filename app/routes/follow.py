@@ -6,6 +6,24 @@ bp = Blueprint('follow', __name__, url_prefix='/follow')
 
 @bp.route('/add', methods=["POST"])
 def follow_user():
+    """
+    Create a follow relationship between two users.
+    
+    Args:
+        Request Body (JSON):
+            - spotifyId1 (str): The Spotify ID of the user who wants to follow
+            - spotifyId2 (str): The Spotify ID of the user to be followed
+    
+    Returns:
+        JSON response with success status and follow data:
+        - success (bool): True if operation successful
+        - follow_id (str): ID of the created follow relationship
+        - message (str): Error message if operation fails
+    
+    Status Codes:
+        201: Follow relationship created successfully
+        400: Bad request (invalid data or validation error)
+    """
     data = request.get_json()
     try:
         follow = Follow(
@@ -19,6 +37,24 @@ def follow_user():
     
 @bp.route('/remove', methods=["DELETE"])
 def unfollow_user():
+    """
+    Remove a follow relationship between two users.
+    
+    Args:
+        Query Parameters:
+            - spotifyId1 (str): The Spotify ID of the user who wants to unfollow
+            - spotifyId2 (str): The Spotify ID of the user to be unfollowed
+    
+    Returns:
+        JSON response with success status:
+        - success (bool): True if operation successful, False if no relationship found
+        - message (str): Error message if operation fails
+    
+    Status Codes:
+        201: Follow relationship removed successfully
+        204: No follow relationship found to remove
+        400: Bad request (invalid data or validation error)
+    """
     spotify_id_1 = request.args.get('spotifyId1', default="", type=str)
     spotify_id_2 = request.args.get('spotifyId2', default="", type=str)
     try:
@@ -31,6 +67,31 @@ def unfollow_user():
     
 @bp.route('/following/<spotify_id>', methods=['GET'])
 def get_following(spotify_id):
+    """
+    Get all users that a specific user is following.
+    
+    Args:
+        spotify_id (str): The Spotify ID of the user whose following list to retrieve
+    
+    Headers:
+        Spotify-Token (str): Spotify access token required for API calls
+    
+    Returns:
+        JSON response with following data:
+        - following (list): List of users being followed with enriched information:
+            - user_id (str): Spotify user ID
+            - user_display_name (str): User's display name
+            - user_image (str): URL to user's profile image
+        - following (null): If no following relationships exist
+        - success (bool): False if operation fails
+        - message (str): Error message if operation fails
+        - error (str): Detailed error information if applicable
+    
+    Status Codes:
+        200: Successfully retrieved following list
+        401: Missing or invalid Spotify access token
+        400: Error fetching user information from Spotify API
+    """
     following = Follow.get_following(spotify_id)
     spotify_access_token = request.headers.get('Spotify-Token')
 
@@ -56,6 +117,31 @@ def get_following(spotify_id):
 
 @bp.route('/followers/<spotify_id>', methods=['GET'])
 def get_followers(spotify_id):
+    """
+    Get all users that are following a specific user.
+    
+    Args:
+        spotify_id (str): The Spotify ID of the user whose followers list to retrieve
+    
+    Headers:
+        Spotify-Token (str): Spotify access token required for API calls
+    
+    Returns:
+        JSON response with followers data:
+        - followers (list): List of followers with enriched information:
+            - user_id (str): Spotify user ID
+            - user_display_name (str): User's display name
+            - user_image (str): URL to user's profile image
+        - followers (null): If no followers exist
+        - success (bool): False if operation fails
+        - message (str): Error message if operation fails
+        - error (str): Detailed error information if applicable
+    
+    Status Codes:
+        200: Successfully retrieved followers list
+        401: Missing or invalid Spotify access token
+        400: Error fetching user information from Spotify API
+    """
     followers = Follow.get_followers(spotify_id)
     spotify_access_token = request.headers.get('Spotify-Token')
 

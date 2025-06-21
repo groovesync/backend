@@ -5,7 +5,7 @@ class TokenManager:
     @staticmethod
     def invalidate_tokens_for_user(username):
         """
-        Invalida todos os tokens de refresh de um usuário.
+        Invalidates all refresh tokens for a user.
         """
         db = PersistenceManager.get_database()
         db.refresh_tokens.delete_many({"username": username})
@@ -13,7 +13,7 @@ class TokenManager:
     @staticmethod
     def store_refresh_token(username, refresh_token):
         """
-        Armazena ou atualiza o refresh token de um usuário.
+        Stores or updates the refresh token for a user.
         """
         db = PersistenceManager.get_database()
         db.refresh_tokens.update_one(
@@ -26,7 +26,7 @@ class TokenManager:
     @staticmethod
     def delete_refresh_token(refresh_token):
         """
-        Deleta um refresh token específico.
+        Deletes a specific refresh token.
         """
         db = PersistenceManager.get_database()
         db.refresh_tokens.delete_one({"refresh_token": refresh_token})
@@ -34,7 +34,8 @@ class TokenManager:
     @staticmethod
     def cleanup_expired_tokens():
         """
-        Limpa todos os refresh tokens expirados.
+        Cleans up all expired refresh tokens.
         """
         db = PersistenceManager.get_database()
         db.refresh_tokens.delete_many({"exp": {"$lt": datetime.utcnow()}})
+

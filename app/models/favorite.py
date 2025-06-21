@@ -55,7 +55,7 @@ class Favorite:
         try:
             object_id = ObjectId(favorite_id)
         except Exception as e:
-            print(f"Erro converting favorite_id: {e}")
+            print(f"Error converting favorite_id: {e}")
             return False
 
         result = db.favorites.delete_one({"_id": object_id})

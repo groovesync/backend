@@ -6,6 +6,23 @@ bp = Blueprint('favorite', __name__, url_prefix='/favorite')
 
 @bp.route('/save', methods=["POST"])
 def save():
+    """
+    Save a new favorite album for a user.
+    
+    Request body:
+        userId (str): Spotify user ID of the user
+        albumId (str): Spotify album ID to favorite
+        
+    Returns:
+        JSON response with:
+            - success (bool): Whether the save was successful
+            - favorite_id (str): ID of the created favorite (if successful)
+            - message (str): Error message (if failed)
+            
+    Status codes:
+        - 201: Favorite saved successfully
+        - 400: Invalid data (invalid user ID, etc.)
+    """
     data = request.get_json()
     try:
         favorite = Favorite(
@@ -19,6 +36,34 @@ def save():
     
 @bp.route('/get/<user_id>', methods=['GET'])
 def get(user_id):
+    """
+    Get all favorite albums for a specific user with enriched album information.
+    
+    Path parameters:
+        user_id (str): Spotify user ID to get favorites for
+        
+    Headers required:
+        Spotify-Token: Valid Spotify access token
+        
+    Returns:
+        JSON response with:
+            - success (bool): Whether the request was successful
+            - favorites (list): List of enriched favorite album objects
+            - message (str): Error message (if failed)
+            
+    Favorite album object structure:
+        - album_id (str): Spotify album ID
+        - album_name (str): Album title
+        - album_url (str): Spotify album URL
+        - album_image (str): Album cover image URL
+        - release_year (str): Album release year
+        - artists (list): List of artist objects with name and id
+        
+    Status codes:
+        - 200: Favorites retrieved successfully
+        - 401: Missing Spotify access token
+        - 400: Error fetching album from Spotify
+    """
     favorites = Favorite.get_by_user(user_id)
 
     if not favorites:
@@ -56,6 +101,21 @@ def get(user_id):
 
 @bp.route('/delete/<favorite_id>', methods=['DELETE'])
 def delete(favorite_id):
+    """
+    Delete a favorite album.
+    
+    Path parameters:
+        favorite_id (str): ID of the favorite to delete
+        
+    Returns:
+        JSON response with:
+            - success (bool): Whether the deletion was successful
+            - message (str): Error message (if failed)
+            
+    Status codes:
+        - 200: Favorite deleted successfully
+        - 404: Favorite not found
+    """
     success = Favorite.delete(favorite_id)
     if success:
         return jsonify({"success": True}), 200

@@ -13,6 +13,25 @@ RELEASE_OFFSET = random.randint(10, 30)
 @bp.route('/recent-tracks', methods=['GET'])
 @token_required
 def get_recent_tracks():
+    """
+    Get the user's recently played tracks from Spotify.
+    
+    Headers:
+        Spotify-Token (str): Valid Spotify access token
+        Authorization (str): Bearer token for user authentication
+    
+    Returns:
+        JSON response with:
+            - success (bool): True if operation successful
+            - data (dict): Spotify API response containing recent tracks
+            - message (str): Error message if operation fails
+            - error (str): Detailed error information if applicable
+    
+    Status codes:
+        - 200: Successfully retrieved recent tracks
+        - 401: Missing or invalid Spotify access token
+        - 400: Error fetching recent tracks from Spotify API
+    """
     spotify_access_token = request.headers.get('Spotify-Token')
     if not spotify_access_token:
         return jsonify({"success": False, "message": "Spotify access token required"}), 401
@@ -29,6 +48,26 @@ def get_recent_tracks():
 @bp.route('/current-track', methods=['GET'])
 @token_required
 def get_current_track():
+    """
+    Get the currently playing track for the authenticated user.
+    
+    Headers:
+        Spotify-Token (str): Valid Spotify access token
+        Authorization (str): Bearer token for user authentication
+    
+    Returns:
+        JSON response with:
+            - success (bool): True if operation successful
+            - data (dict): Spotify API response containing current track info
+            - message (str): Error message if operation fails or no track playing
+            - error (str): Detailed error information if applicable
+    
+    Status codes:
+        - 200: Successfully retrieved current track
+        - 204: No track is currently playing
+        - 401: Missing or invalid Spotify access token
+        - 400: Error fetching current track from Spotify API
+    """
     spotify_access_token = request.headers.get('Spotify-Token')
     if not spotify_access_token:
         return jsonify({"success": False, "message": "Spotify access token required"}), 401
@@ -48,6 +87,25 @@ def get_current_track():
 @bp.route('/obsessions', methods=['GET'])
 @token_required
 def get_top_items():
+    """
+    Get the user's top artists (obsessions) from Spotify.
+    
+    Headers:
+        Spotify-Token (str): Valid Spotify access token
+        Authorization (str): Bearer token for user authentication
+    
+    Returns:
+        JSON response with:
+            - success (bool): True if operation successful
+            - data (dict): Spotify API response containing top artists
+            - message (str): Error message if operation fails
+            - error (str): Detailed error information if applicable
+    
+    Status codes:
+        - 200: Successfully retrieved top artists
+        - 401: Missing or invalid Spotify access token
+        - 400: Error fetching top artists from Spotify API
+    """
     spotify_access_token = request.headers.get('Spotify-Token')
     if not spotify_access_token:
         return jsonify({"success": False, "message": "Spotify access token required"}), 401
@@ -64,6 +122,28 @@ def get_top_items():
 @bp.route('/artist/<artist_id>', methods=['GET'])
 @token_required
 def get_artist(artist_id):
+    """
+    Get detailed information about a specific artist.
+    
+    Args:
+        artist_id (str): Spotify artist ID
+    
+    Headers:
+        Spotify-Token (str): Valid Spotify access token
+        Authorization (str): Bearer token for user authentication
+    
+    Returns:
+        JSON response with:
+            - success (bool): True if operation successful
+            - data (dict): Spotify API response containing artist information
+            - message (str): Error message if operation fails
+            - error (str): Detailed error information if applicable
+    
+    Status codes:
+        - 200: Successfully retrieved artist information
+        - 401: Missing or invalid Spotify access token
+        - 400: Error fetching artist data from Spotify API
+    """
     spotify_access_token = request.headers.get('Spotify-Token')
     if not spotify_access_token:
         return jsonify({"success": False, "message": "Spotify access token required"}), 401
@@ -79,6 +159,28 @@ def get_artist(artist_id):
 @bp.route('/artist/<artist_id>/albums', methods=['GET'])
 @token_required
 def get_album_by_artist(artist_id):
+    """
+    Get all albums by a specific artist.
+    
+    Args:
+        artist_id (str): Spotify artist ID
+    
+    Headers:
+        Spotify-Token (str): Valid Spotify access token
+        Authorization (str): Bearer token for user authentication
+    
+    Returns:
+        JSON response with:
+            - success (bool): True if operation successful
+            - data (dict): Spotify API response containing artist's albums
+            - message (str): Error message if operation fails
+            - error (str): Detailed error information if applicable
+    
+    Status codes:
+        - 200: Successfully retrieved artist albums
+        - 401: Missing or invalid Spotify access token
+        - 400: Error fetching artist albums from Spotify API
+    """
     spotify_access_token = request.headers.get('Spotify-Token')
     if not spotify_access_token:
         return jsonify({"success": False, "message": "Spotify access token required"}), 401
@@ -94,6 +196,25 @@ def get_album_by_artist(artist_id):
 @bp.route('/saved-albums', methods=['GET'])
 @token_required
 def get_saved_albums():
+    """
+    Get the user's saved albums from Spotify.
+    
+    Headers:
+        Spotify-Token (str): Valid Spotify access token
+        Authorization (str): Bearer token for user authentication
+    
+    Returns:
+        JSON response with:
+            - success (bool): True if operation successful
+            - data (dict): Spotify API response containing saved albums
+            - message (str): Error message if operation fails
+            - error (str): Detailed error information if applicable
+    
+    Status codes:
+        - 200: Successfully retrieved saved albums
+        - 401: Missing or invalid Spotify access token
+        - 500: Error fetching saved albums from Spotify API
+    """
     spotify_access_token = request.headers.get('Spotify-Token')
     if not spotify_access_token:
         return jsonify({"success": False, "message": "Spotify access token required"}), 401
@@ -108,6 +229,25 @@ def get_saved_albums():
 @bp.route('/recommendations', methods=['GET'])
 @token_required
 def get_recommendation():
+    """
+    Get new release recommendations for the user.
+    
+    Headers:
+        Spotify-Token (str): Valid Spotify access token
+        Authorization (str): Bearer token for user authentication
+    
+    Returns:
+        JSON response with:
+            - success (bool): True if operation successful
+            - data (dict): Spotify API response containing new releases
+            - message (str): Error message if operation fails
+            - error (str): Detailed error information if applicable
+    
+    Status codes:
+        - 200: Successfully retrieved recommendations
+        - 401: Missing or invalid Spotify access token
+        - 500: Error fetching recommendations from Spotify API
+    """
     spotify_access_token = request.headers.get('Spotify-Token')
     if not spotify_access_token:
         return jsonify({"success": False, "message": "Spotify access token required"}), 401
@@ -122,6 +262,25 @@ def get_recommendation():
 @bp.route('/new-releases', methods=['GET'])
 @token_required
 def get_new_releases():
+    """
+    Get the latest new releases from Spotify.
+    
+    Headers:
+        Spotify-Token (str): Valid Spotify access token
+        Authorization (str): Bearer token for user authentication
+    
+    Returns:
+        JSON response with:
+            - success (bool): True if operation successful
+            - data (dict): Spotify API response containing new releases
+            - message (str): Error message if operation fails
+            - error (str): Detailed error information if applicable
+    
+    Status codes:
+        - 200: Successfully retrieved new releases
+        - 401: Missing or invalid Spotify access token
+        - 500: Error fetching new releases from Spotify API
+    """
     spotify_access_token = request.headers.get('Spotify-Token')
     if not spotify_access_token:
         return jsonify({"success": False, "message": "Spotify access token required"}), 401
@@ -137,6 +296,31 @@ def get_new_releases():
 @bp.route('/search', methods=['GET'])
 @token_required
 def search_artists_and_albums():
+    """
+    Search for artists and albums on Spotify.
+    
+    Headers:
+        Spotify-Token (str): Valid Spotify access token
+        Authorization (str): Bearer token for user authentication
+    
+    Query Parameters:
+        q (str): Search query string (required)
+        limit (int): Maximum number of results to return (default: 20)
+    
+    Returns:
+        JSON response with:
+            - success (bool): True if operation successful
+            - artists (dict): Spotify API response containing artist search results
+            - albums (dict): Spotify API response containing album search results
+            - message (str): Error message if operation fails
+            - error (str): Detailed error information if applicable
+    
+    Status codes:
+        - 200: Successfully performed search
+        - 400: Missing query parameter or search error
+        - 401: Missing or invalid Spotify access token
+        - 500: Error performing search on Spotify API
+    """
     spotify_access_token = request.headers.get('Spotify-Token')
     if not spotify_access_token:
         return jsonify({"success": False, "message": "Spotify access token required"}), 401
@@ -150,6 +334,8 @@ def search_artists_and_albums():
     sp = spotipy.Spotify(auth=spotify_access_token)
     try:
         data = sp.search(q=query, type='artist,album', limit=limit)
+        if data is None:
+            return jsonify({"success": False, "message": "No search results found"}), 404
         return jsonify({"success": True, "artists": data["artists"], "albums": data["albums"]}), 200
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
@@ -158,6 +344,30 @@ def search_artists_and_albums():
 @bp.route('/search/albums', methods=['GET'])
 @token_required
 def search_albums():    
+    """
+    Search for albums only on Spotify.
+    
+    Headers:
+        Spotify-Token (str): Valid Spotify access token
+        Authorization (str): Bearer token for user authentication
+    
+    Query Parameters:
+        q (str): Search query string (required)
+        limit (int): Maximum number of results to return (default: 10)
+    
+    Returns:
+        JSON response with:
+            - success (bool): True if operation successful
+            - data (dict): Spotify API response containing album search results
+            - message (str): Error message if operation fails
+            - error (str): Detailed error information if applicable
+    
+    Status codes:
+        - 200: Successfully performed album search
+        - 400: Missing query parameter
+        - 401: Missing or invalid Spotify access token
+        - 500: Error performing search on Spotify API
+    """
     spotify_access_token = request.headers.get('Spotify-Token')
     if not spotify_access_token:
         return jsonify({"success": False, "message": "Spotify access token required"}), 401
@@ -179,6 +389,28 @@ def search_albums():
 @bp.route('/users/<spotify_id>', methods=['GET'])
 @token_required
 def get_user(spotify_id):
+    """
+    Get information about a Spotify user by their Spotify ID.
+    
+    Args:
+        spotify_id (str): Spotify user ID
+    
+    Headers:
+        Spotify-Token (str): Valid Spotify access token
+        Authorization (str): Bearer token for user authentication
+    
+    Returns:
+        JSON response with:
+            - success (bool): True if operation successful
+            - data (dict): Spotify API response containing user information
+            - message (str): Error message if operation fails
+            - error (str): Detailed error information if applicable
+    
+    Status codes:
+        - 200: Successfully retrieved user information
+        - 401: Missing or invalid Spotify access token
+        - 500: Error fetching user data from Spotify API
+    """
     spotify_access_token = request.headers.get('Spotify-Token')
     if not spotify_access_token:
         return jsonify({"success": False, "message": "Spotify access token required"}), 401
@@ -194,6 +426,44 @@ def get_user(spotify_id):
 @bp.route('/albums/<album_id>', methods=['GET'])
 @token_required
 def get_album_details(album_id):
+    """
+    Get detailed information about a specific album including reviews and user interactions.
+    
+    Args:
+        album_id (str): Spotify album ID
+    
+    Headers:
+        Spotify-Token (str): Valid Spotify access token
+        Authorization (str): Bearer token for user authentication
+    
+    Query Parameters:
+        user_id (str): User ID for retrieving personal reviews and favorites (required)
+    
+    Returns:
+        JSON response with:
+            - success (bool): True if operation successful
+            - album_info (dict): Complete album information including:
+                - name (str): Album name
+                - id (str): Spotify album ID
+                - image (str): Album cover image URL
+                - url (str): Spotify album URL
+                - artists (list): List of artist objects with name and ID
+                - release_year (str): Year of release
+                - overall_rating (float): Average rating from all reviews
+                - your_rating (float): User's personal rating (if exists)
+                - your_review (str): User's review text (if exists)
+                - your_review_id (str): User's review ID (if exists)
+                - reviews (list): Other users' reviews with profile info
+                - is_favorite (bool): Whether user has favorited this album
+                - favorite_id (str): Favorite record ID (if favorited)
+            - message (str): Error message if operation fails
+    
+    Status codes:
+        - 200: Successfully retrieved album details
+        - 204: No album found
+        - 400: Missing user_id parameter or error fetching album
+        - 401: Missing or invalid Spotify access token
+    """
     spotify_access_token = request.headers.get('Spotify-Token')
     if not spotify_access_token:
         return jsonify({"success": False, "message": "Spotify access token required"}), 401
@@ -254,14 +524,41 @@ def get_album_details(album_id):
             user = User.find_user_by_spotify_id(review['userId'])
             if user:
                 spotify_id = user['spotify_id']
-                user_details = sp.user(spotify_id)
-                other_reviews.append({
-                    "username": user_details['display_name'],
-                    "profile_picture": user_details['images'][0]['url'] if user_details['images'] else None,
-                    "rate": review['rate'],
-                    "text": review['text'],
-                    "user_id": user["spotify_id"]
-                })
+                try:
+                    user_details = sp.user(spotify_id)
+                    if user_details and user_details.get('images'):
+                        other_reviews.append({
+                            "username": user_details['display_name'],
+                            "profile_picture": user_details['images'][0]['url'],
+                            "rate": review['rate'],
+                            "text": review['text'],
+                            "user_id": user["spotify_id"]
+                        })
+                    elif user_details:
+                        other_reviews.append({
+                            "username": user_details.get('display_name', 'Unknown User'),
+                            "profile_picture": None,
+                            "rate": review['rate'],
+                            "text": review['text'],
+                            "user_id": user["spotify_id"]
+                        })
+                    else:
+                        other_reviews.append({
+                            "username": "Unknown User",
+                            "profile_picture": None,
+                            "rate": review['rate'],
+                            "text": review['text'],
+                            "user_id": user["spotify_id"]
+                        })
+                except Exception:
+                    # Fallback if Spotify user details can't be fetched
+                    other_reviews.append({
+                        "username": "Unknown User",
+                        "profile_picture": None,
+                        "rate": review['rate'],
+                        "text": review['text'],
+                        "user_id": user["spotify_id"]
+                    })
 
     return jsonify({
         "success": True,
