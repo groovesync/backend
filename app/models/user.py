@@ -1,6 +1,7 @@
 import bcrypt
 from app.utils.persistence_manager import PersistenceManager
 import difflib
+from bson.objectid import ObjectId
 
 class User:
     def __init__(self, username=None, password=None, spotify_id=None):
@@ -73,17 +74,15 @@ class User:
     
     @staticmethod
     def search_users(q=None):
+        if not q:
+            return {"users": []}
+            
         db = PersistenceManager.get_database()
-        all_users = list(db["users"].find())
+        all_users = list(db["users"].find({}, {"username": 1, "spotify_id": 1, "_id": 0}))
+        
         results = difflib.get_close_matches(q, [user["username"] for user in all_users], cutoff=0.6)
         
-        matched_users = [
-            {
-                "username": user["username"],
-                "spotify_id": user["spotify_id"]
-            }
-                for user in all_users if user["username"] in results
-        ]
+        matched_users = [user for user in all_users if user["username"] in results]
         
         return {
             "users": matched_users
@@ -92,19 +91,21 @@ class User:
     @staticmethod
     def get_all_users():
         db = PersistenceManager.get_database()
-        users = list(db["users"].find())
+        users = list(db["users"].find({}, {"username": 1, "spotify_id": 1, "_id": 0}))
 
         return {
             "users": [
                 {
-                    "username": user["name"],
-                    "spotify_id": user["spotify_id"]
+                    "username": user["username"],
+                    "spotify_id": user.get("spotify_id")
                 } for user in users
             ]
-            }
+        }
 
     @staticmethod
     def find_user_by_id(user_id):
         db = PersistenceManager.get_database()
-        return db.users.find_one({"_id": user_id})
-
+        try:
+            return db.users.find_one({"_id": ObjectId(user_id)})
+        except:
+            return None

@@ -1,9 +1,12 @@
 from app import create_app
 from flask_cors import CORS
+from asgiref.wsgi import WsgiToAsgi
 
-app = create_app()
-CORS(app)
+flask_app = create_app()
+
+CORS(flask_app)
+
+app = WsgiToAsgi(flask_app)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
-
+    flask_app.run(host="0.0.0.0", port=5000, debug=True)
